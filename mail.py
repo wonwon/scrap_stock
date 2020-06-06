@@ -8,6 +8,29 @@ from email.utils import formatdate
 
 from jinja2 import Environment, FileSystemLoader
 
+class SendByGmail:
+    def __init__(self, config):
+        self.__fromadd = config['GMAIL']['FROMADD']
+        self.__toadd = config['GMAIL']['TOADD']
+        self.__pass = config['USER']['PASS']
+        self.__charset = 'utf-8'
+
+    def send(self, content):
+        smtp_obj = smtplib.SMTP('smtp.gmail.com', 587)
+        smtp_obj.ehlo()
+        smtp_obj.starttls()
+        smtp_obj.ehlo()
+        smtp_obj.login(self.__fromadd, self.__password)
+
+        msg = MIMEText(content)
+        msg['Subject'] = 'subject'
+        msg['From'] = self.__fromadd
+        msg['To'] = self.__toadd
+        msg['Date'] = formatdate()
+
+        smtp_obj.sendmail(self.__fromadd, self.__toadd, msg.as_string())
+        smtp_obj.close()
+
 #mail template
 env = Environment(loader = FileSystemLoader('./', encoding = 'utf8'))
 tmp = env.get_template('gmail_html.tmpl')

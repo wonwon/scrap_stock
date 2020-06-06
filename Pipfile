@@ -7,6 +7,11 @@ verify_ssl = true
 
 [packages]
 requests = "*"
+configparser = "*"
+smtplib = "*"
+ssl = "*"
+email = "*"
+jinja2 = "*"
 
 [requires]
 python_version = "3.8"
