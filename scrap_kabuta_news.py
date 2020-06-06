@@ -20,7 +20,5 @@ def extractlink(soup):
     return stocklist
 
 uri = base_uri + news_uri
-
 soup = uri2soup(uri)
 stocklist = extractlink(soup)
-print(stocklist)
