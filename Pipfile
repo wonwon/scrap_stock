@@ -12,6 +12,7 @@ smtplib = "*"
 ssl = "*"
 email = "*"
 jinja2 = "*"
+beautifulsoup = "*"
 
 [requires]
 python_version = "3.8"
