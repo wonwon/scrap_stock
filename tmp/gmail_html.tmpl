@@ -3,24 +3,25 @@
     <head>
     <meta charset="UTF-8">
         <body>
-        {% for stok in stoks %}
-            <h4>{{ loop.index }} : {{ stok.price }}円 {{ stok.name }}</h4>
-            <img src="{{ stok.img }}" /></br>
+        <p>{{ mailbody }}
+        </p>
+        {% for stock in stocks %}
+            <h4>{{ loop.index }} : {{ stock.price }}円 {{ stock.name }}</h4>
+            <img src="{{ stock.img }}" /></br>
             <table>
                 <tr>
-                    <td><a href="{{ stok.hisuri }}">株価時系列</a></td>
-                    <td><a href="{{ stok.shihisuri }}">信用時系列</a></td>
-                    <td><a href="{{ stok.kabutan }}">株探ニュース</a></td>
+                    <td><a href="{{ stock.hisuri }}">株価時系列</a></td>
+                    <td><a href="{{ stock.shihisuri }}">信用時系列</a></td>
+                    <td><a href="{{ stock.kabutan }}">株探ニュース</a></td>
                 </tr>
                 <tr>
-                    <td><a href="{{ stok.kabureal }}">株価リアル</a></td>
-                    <td><a href="{{ stok.ispeed }}">ispeed</a></td>
-                    <td><a href="{{ stok.rakuten }}">楽天証券</a></td>
+                    <td><a href="{{ stock.kabureal }}">株価リアル</a></td>
+                    <td><a href="{{ stock.rakuten }}">楽天証券</a></td>
                 </tr>
             </table>
-            <p>{{ stok.detail }}</p>
-            <p>{{ stok.fund }}</p>
-            <p>{{ stok.shinyou }}</p>
+            <p>{{ stock.detail }}</p>
+            <p>{{ stock.fund }}</p>
+            <p>{{ stock.shinyou }}</p>
         {% endfor %}
         </body>
 </html>
