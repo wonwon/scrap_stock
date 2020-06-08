@@ -3,7 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import time
-from DB import class_sqlite
+#from DB import class_sqlite
 
 base_uri = 'https://adr-stock.com/'
 
@@ -18,3 +18,4 @@ def extractlink(soup):
 
 soup = uri2soup(base_uri)
 print(extractlink(soup))
+print(soup)

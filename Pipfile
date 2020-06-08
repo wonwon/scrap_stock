@@ -13,6 +13,9 @@ ssl = "*"
 email = "*"
 jinja2 = "*"
 beautifulsoup = "*"
+beautifulsoup4 = "*"
+beutifulsoup4 = "*"
+beutifulsoup = "*"
 
 [requires]
 python_version = "3.8"
