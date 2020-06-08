@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import time
-from mail import SendByGmail
+import Gmail
 from jinja2 import Environment, FileSystemLoader
 #import re
 #from DB import class_sqlite
@@ -21,7 +21,7 @@ def uri2soup(uri):
 
 def extractlink(soup):
     stocklist = {}
-    sotcklist['title'] = soup.select('article > h1')[0]
+    stocklist['title'] = soup.select('article > h1')[0]
     stocklist['body'] = soup.select('article')[0]
 
     data = soup.select('div.body > a[href*="stock/?code="]')
@@ -32,4 +32,8 @@ def extractlink(soup):
 uri = base_uri + news_uri
 soup = uri2soup(uri)
 stocklist = extractlink(soup)
-print(stocklist)
+
+html = tmp.render({\
+        'mailbody': stocklist['body'],\
+         })
+print(html)
