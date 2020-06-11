@@ -34,16 +34,21 @@ def extlink(uri):
 def extstock(uri):
     soup = uri2soup(uri)
     price = soup.select('span.kabuka')
-    sti = soup.select('table.stockinfo_i3')
-    tbl1 = soup.select('table.stock_kabuka0')
-    tbl2 = soup.select('table.stock_kabuka0')
-    sp = re.match('([0-9,]+)', price[0].text)
-    sp = sp.group(1).replace(',', '')
-    if int(sp) > 500:
+    sp = re.match('([0-9,]+)', price[0].text).group(1).replace(',', '')
+    if int(sp) < 500:
         print(sp)
-    #print(stockinfo.text)
-    #print(tbl1.text)
-    #print(tbl2.text)
+        cp = soup.select('h2')
+        ind = soup.select('#stockinfo_i2 > div')
+        print(cp[0].text + '(' + ind[0].text.replace('\n', '') + ')')
+        sti = soup.select('#stockinfo_i3')[0].text.replace('\n', '')
+        print(sti)
+        tbhead = soup.select('table.stock_kabuka0 > thead > tr')[0].text.replace('\n', ' ')
+        tbl1 = soup.select('table.stock_kabuka0 > tbody > tr')[0].text.replace('\n', ' ')
+        print(tbhead)
+        print(tbl1)
+        for i in range(5):
+            tbl2 = soup.select('table.stock_kabuka1 > tbody > tr:nth-child(-n+5)')[i].text.replace('\n', ' ')
+            print(tbl2)
 
 for i in range(1, 11):
     uri = base_uri + cont_uri + page_uri + str(i)
