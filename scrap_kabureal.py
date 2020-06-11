@@ -34,10 +34,13 @@ def extlink(uri):
 def extstock(uri):
     soup = uri2soup(uri)
     price = soup.select('span.kabuka')
-    stockinfo = soup.select('table.stockinfo_i3')
+    sti = soup.select('table.stockinfo_i3')
     tbl1 = soup.select('table.stock_kabuka0')
     tbl2 = soup.select('table.stock_kabuka0')
-    print(price[0].text)
+    sp = re.match('([0-9,]+)', price[0].text)
+    sp = sp.group(1).replace(',', '')
+    if int(sp) > 500:
+        print(sp)
     #print(stockinfo.text)
     #print(tbl1.text)
     #print(tbl2.text)
