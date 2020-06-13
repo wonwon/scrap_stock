@@ -13,6 +13,8 @@ base_uri = 'https://kabutan.jp'
 rank_uri = '/info/accessranking/3_2'
 theme_uri = '/themes/?theme='
 page_uri = '&market=0&capitalization=-1&stc=zenhiritsu&stm=1&page='
+# kabureal uri
+kabureal = 'http://kabureal.net/brand/?code='
 
 
 def uri2soup(uri):
@@ -34,6 +36,10 @@ def extstockuri(uri):
         data[links[i].text] = stocks[i].text
 
     return data
+
+def extkaburealdata(uri):
+    soup = uri2soup(uri)
+    return soup.select('div.tcenter > img')[0]['src']
 
 def extstock(uri):
     soup = uri2soup(uri)
@@ -62,17 +68,20 @@ def extstock(uri):
 
     return body_text
 
+# extract themelink
 links = extlink(base_uri +  rank_uri)
 for i in range(5):
-    for j in range(1, 2):
+    # extract stock link & price links[i].text
+    for j in range(1, 5):
         time.sleep(2)
         list_uri = base_uri + theme_uri + urllib.parse.quote(links[i].text) + page_uri + str(j)
         data = extstockuri(list_uri)
-        print(data)
-        for k, v in data.items():
-            print(k, v)
-            if int(re.sub('\D', '', v)) < 600:
-                print("Hit" + k)
+        for code, stock in data.items():
+            #extract under 600 yen
+            if int(re.sub('\D', '', stock)) < 600:
+                print("Hit" + code + '-' + stock + 'yen')
+                img = extkaburealdata(kabureal + str(code))
+                print(img)
             
 
 
