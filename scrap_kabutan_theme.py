@@ -4,19 +4,16 @@ import time
 import Gmail
 from jinja2 import Environment, FileSystemLoader
 import re
+import urllib.parse
 #from DB import class_sqlite
 
 #uri
-# kabu real url
-base_uri = 'http://kabureal.net/'
-lower_uri = 'lower/pro/'
-page_uri = '?page='
-#kabu tan url
-kabutan_uri = 'https://kabutan.jp/stock/kabuka?code='
+# kabutan theme url
+base_uri = 'https://kabutan.jp'
+rank_uri = '/info/accessranking/3_2'
+theme_uri = '/themes/?theme='
+page_uri = '&market=0&capitalization=-1&stc=zenhiritsu&stm=1&page='
 
-#gmail template
-env = Environment(loader = FileSystemLoader('./', encoding = 'utf8'))
-tmp = env.get_template('./tmp/gmail_html.tmpl')
 
 def uri2soup(uri):
     html = requests.get(uri)
@@ -25,11 +22,18 @@ def uri2soup(uri):
 
 def extlink(uri):
     soup = uri2soup(uri)
-    data = soup.select('div.mbtm5 > a[href*="brand/?code="]')
-    stock = []
-    for d in data:
-        stock.append(re.findall(r'\d{4}$', d['href'])[0])
-    return stock
+    data = soup.select('td.acrank_url > a')
+    return data
+
+def extstockuri(uri):
+    soup = uri2soup(uri)
+    data = {}
+    links = soup.select('td.tac > a')
+    stocks = soup.select('table.stock_table > tr > td:nth-child(6)')
+    for i in range(len(links)):
+        data[links[i].text] = stocks[i].text
+
+    return data
 
 def extstock(uri):
     soup = uri2soup(uri)
@@ -58,14 +62,23 @@ def extstock(uri):
 
     return body_text
 
-for i in range(1, 11):
-    uri = base_uri + cont_uri + page_uri + str(i)
-    stock = extlink(uri)
-    for j in stock:
-        print(extstock(kabutan_uri + j))
-        time.sleep(1)
-    time.sleep(1)
+links = extlink(base_uri +  rank_uri)
+for i in range(5):
+    for j in range(1, 2):
+        time.sleep(2)
+        list_uri = base_uri + theme_uri + urllib.parse.quote(links[i].text) + page_uri + str(j)
+        data = extstockuri(list_uri)
+        print(data)
+        for k, v in data.items():
+            print(k, v)
+            if int(re.sub('\D', '', v)) < 600:
+                print("Hit" + k)
+            
 
+
+#gmail template
+env = Environment(loader = FileSystemLoader('./', encoding = 'utf8'))
+tmp = env.get_template('./tmp/gmail_html.tmpl')
 #html = tmp.render({\
 #        'mailbody': stocklist['body'],\
 #         })
