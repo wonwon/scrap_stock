@@ -51,7 +51,7 @@ def extstockuri(uri):
 
     return data
 
-def extkaburealdata(uri):
+def extimg(uri):
     #extract chart img from code
     soup = uri2soup(uri)
     return soup.select('div.tcenter > img')[0]['src']
@@ -74,44 +74,39 @@ def extstock(uri):
          
     return body
 
-def sendmail(links):
+def sendmail(uri):
     #gmail template
     env = Environment(loader = FileSystemLoader('./', encoding = 'utf8'))
     tmp = env.get_template('./tmp/gmail_html.tmpl')
 
-    for i in range(9):
-        time.sleep(5)
-        body = []
-        # extract stock link & price links[i].text 5pages
-        for j in range(1, 5):
-            list_uri = base_uri + theme_uri + urllib.parse.quote(links[i].text) + page_uri + str(j)
-            data = extstockuri(list_uri)
-            for code, stock in data.items():
-                #extract under 600 yen
-                if int(re.sub('\D', '', stock)) < 600:
-                    time.sleep(2)
-                    #extract kabureal img
-                    img = extkaburealdata(kabureal + str(code))
-                    inf = extstock(base_uri + stock_uri + str(code))
-                    print(inf['name'])
-                    body.append({
-                        'name' : inf['name'],
-                        'code' : str(code),
-                        'stock' : str(stock),
-                        'img' : img,
-                        'info' : inf['info'],
-                        'head' : inf['tbhead'],
-                        'table' : inf['past'],
-                    })
+    # extract stock link & price links[i].text 5pages
+    for j in range(1, 5):
+        data = extstockuri(uri)
+        for code, stock in data.items():
+            #extract under 600 yen
+            if int(re.sub('\D', '', stock)) < 600:
+                time.sleep(2)
+                #extract kabureal img
+                img = extimg(kabureal + str(code))
+                inf = extstock(base_uri + stock_uri + str(code))
+                print(inf['name'])
+                body.append({
+                    'name' : inf['name'],
+                    'code' : str(code),
+                    'stock' : str(stock),
+                    'img' : img,
+                    'info' : inf['info'],
+                    'head' : inf['tbhead'],
+                    'table' : inf['past'],
+                })
 
-        print(links[i].text)
-        html = tmp.render({
-            'theme' : links[i].text,
-            'articles' : body })
-        print(html)
-        mail = SendByGmail(config)
-        msg = mail.make(links[i].text, html, 'html')
-        mail.send(msg)
+    html = tmp.render({
+        'theme' : links[i].text,
+        'articles' : body })
+    mail = SendByGmail(config)
+    msg = mail.make(subject, html, 'html')
+    mail.send(msg)
 
 # extract themelink 10
 links = extlink(base_uri +  rank_uri)
+sendmail(links)

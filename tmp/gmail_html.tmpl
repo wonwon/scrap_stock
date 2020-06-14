@@ -6,9 +6,6 @@
         {% for article in articles %}
             <h4> {{ loop.index }} : {{ article.stock }}円  {{ article.name }}</h4>
             <p><img src="{{ article.img }}" /></p>
-            <p> {{ article.info}}</br>
-            {{ article.tbhead }}</br>
-            {{ article.past }}</p>
             <p>{{ article.info }}</p>
             <p>{{ article.head }}</p>
             <p>{{ article.table }}</p>
