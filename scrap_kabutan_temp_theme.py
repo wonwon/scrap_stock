@@ -75,13 +75,15 @@ def extstock(uri):
     return body
 
 def sendmail(uri):
+    grep = re.match(r'.*?theme=(.*?)&market', uri)
+    themes = urllib.parse.unquote(grep.group(1))
     #gmail template
     env = Environment(loader = FileSystemLoader('./', encoding = 'utf8'))
     tmp = env.get_template('./tmp/gmail_html.tmpl')
-
+    body = []
     # extract stock link & price links[i].text 5pages
     for j in range(1, 5):
-        data = extstockuri(uri)
+        data = extstockuri(uri + str(j))
         for code, stock in data.items():
             #extract under 600 yen
             if int(re.sub('\D', '', stock)) < 600:
@@ -101,12 +103,11 @@ def sendmail(uri):
                 })
 
     html = tmp.render({
-        'theme' : links[i].text,
+        'theme' : themes,
         'articles' : body })
     mail = SendByGmail(config)
-    msg = mail.make(subject, html, 'html')
+    msg = mail.make(themes, html, 'html')
     mail.send(msg)
 
-# extract themelink 10
-links = extlink(base_uri +  rank_uri)
-sendmail(links)
+uri ='https://kabutan.jp/themes/?theme=%E3%82%AD%E3%83%A3%E3%83%83%E3%82%B7%E3%83%A5%E3%83%AC%E3%82%B9%E6%B1%BA%E6%B8%88&market=0&capitalization=-1&stc=zenhiritsu&stm=1&page=' 
+sendmail(uri)
