@@ -3,17 +3,18 @@
     <head>
     <meta charset="UTF-8">
         <body>
-        <h3>{{ theme }}/h3>
         {% for article in articles %}
             <h4>{{ loop.index }} : {{ article.stock }}円 {{ article.name }}</h4>
-            <img src="{{ article.img }}" /></br>
-            <table>
-                <tr>
-                    <td><a href="{{ article.code }}"></a>{{ article.code }}</td>
-                    <td><a href="{{ article.stock }}">{{ article.stock }}</a></td>
-                    <td><a href="{{ article.info }}">{{ article.info }}</a></td>
-                </tr>
-            </table>
+            <p><img src="{{ article.img }}" /></p>
+            <p> {{ article.info}}</br>
+            {{ article.tbhead }}</br>
+            {{ article.past }}</p>
+            <p>
+            <a href="https://kabutan.jp/stock/news?code={{ article.code }}" target="_blank">株探</a></br>
+            <a href="https://stocks.finance.yahoo.co.jp/stocks/news/?code={{ article.code }}.T" target="_blank">yahooファイナンス</a></br>
+            <a href="https://www.nikkei.com/nkd/company/?scode={{ article.code }}" target="_blank">日経新聞</a></br>
+            <a href="https://www.nikkei.com/smartchart/?code={{ article.code }}&timeframe=3m&interval=1Day&upperIndicators=sma&lowerIndicators=volume&eventsShow=0" target="_blank">smartchart</a>
+            </p>
         {% endfor %}
         </body>
 </html>

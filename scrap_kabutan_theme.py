@@ -1,11 +1,20 @@
 import requests
 from bs4 import BeautifulSoup
 import time
-import Gmail
+from Gmail import SendByGmail
 from jinja2 import Environment, FileSystemLoader
 import re
 import urllib.parse
-#from DB import class_sqlite
+import configparser
+# mail config
+config_ini = configparser.ConfigParser()
+config_ini.read('./../../CONF/config.ini', encoding = 'utf-8')
+config = {}
+
+config['FROM'] = config_ini['GMAIL']['USER']
+config['TO'] = config_ini['GMAIL']['USER']
+config['PASS'] =  config_ini['GMAIL']['PASS']
+
 
 #uri
 # kabutan theme url
@@ -83,6 +92,7 @@ for i in range(5):
                 inf = extstock(base_uri + stock_uri + str(code))
                 print(inf['name'])
                 body.append({
+                    'name' : inf['name'],
                     'code' : str(code),
                     'stock' : str(stock),
                     'img' : img,
@@ -96,4 +106,7 @@ for i in range(5):
         'theme' : links[i].text,
         'articles' : body })
     print(html)
+    mail = SendByGmail(config)
+    msg = mail.make(links[i].text, html, 'html')
+    mail.send(msg)
 
