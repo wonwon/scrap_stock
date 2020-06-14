@@ -3,25 +3,17 @@
     <head>
     <meta charset="UTF-8">
         <body>
-        <p>{{ mailbody }}
-        </p>
-        {% for stock in stocks %}
-            <h4>{{ loop.index }} : {{ stock.price }}円 {{ stock.name }}</h4>
-            <img src="{{ stock.img }}" /></br>
+        <h3>{{ theme }}/h3>
+        {% for article in articles %}
+            <h4>{{ loop.index }} : {{ article.stock }}円 {{ article.name }}</h4>
+            <img src="{{ article.img }}" /></br>
             <table>
                 <tr>
-                    <td><a href="{{ stock.hisuri }}">株価時系列</a></td>
-                    <td><a href="{{ stock.shihisuri }}">信用時系列</a></td>
-                    <td><a href="{{ stock.kabutan }}">株探ニュース</a></td>
-                </tr>
-                <tr>
-                    <td><a href="{{ stock.kabureal }}">株価リアル</a></td>
-                    <td><a href="{{ stock.rakuten }}">楽天証券</a></td>
+                    <td><a href="{{ article.code }}"></a>{{ article.code }}</td>
+                    <td><a href="{{ article.stock }}">{{ article.stock }}</a></td>
+                    <td><a href="{{ article.info }}">{{ article.info }}</a></td>
                 </tr>
             </table>
-            <p>{{ stock.detail }}</p>
-            <p>{{ stock.fund }}</p>
-            <p>{{ stock.shinyou }}</p>
         {% endfor %}
         </body>
 </html>
