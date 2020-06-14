@@ -19,8 +19,6 @@ config['PASS'] =  config_ini['GMAIL']['PASS']
 #uri
 # kabutan theme url
 base_uri = 'https://kabutan.jp'
-rank_uri = '/info/accessranking/3_2'
-theme_uri = '/themes/?theme='
 stock_uri = '/stock/kabuka?code='
 page_uri = '&market=0&capitalization=-1&stc=zenhiritsu&stm=1&page='
 # kabureal uri
@@ -28,16 +26,19 @@ kabureal = 'http://kabureal.net/brand/?code='
 
 
 def uri2soup(uri):
+    #uri to soup object
     html = requests.get(uri)
     soup = BeautifulSoup(html.text, 'html.parser')
     return soup
 
 def extlink(uri):
+    # extract link from themes page
     soup = uri2soup(uri)
     data = soup.select('td.acrank_url > a')
     return data
 
 def extstockuri(uri):
+    # extract code and close stock from list
     soup = uri2soup(uri)
     data = {}
     links = soup.select('td.tac > a')
@@ -51,10 +52,12 @@ def extstockuri(uri):
     return data
 
 def extkaburealdata(uri):
+    #extract chart img from code
     soup = uri2soup(uri)
     return soup.select('div.tcenter > img')[0]['src']
 
 def extstock(uri):
+    # extract stock data from kabutan
     soup = uri2soup(uri)
     body = {}
     #stock name category
@@ -71,43 +74,44 @@ def extstock(uri):
          
     return body
 
-#gmail template
-env = Environment(loader = FileSystemLoader('./', encoding = 'utf8'))
-tmp = env.get_template('./tmp/gmail_html.tmpl')
+def sendmail(links):
+    #gmail template
+    env = Environment(loader = FileSystemLoader('./', encoding = 'utf8'))
+    tmp = env.get_template('./tmp/gmail_html.tmpl')
+
+    for i in range(9):
+        time.sleep(5)
+        body = []
+        # extract stock link & price links[i].text 5pages
+        for j in range(1, 5):
+            list_uri = base_uri + theme_uri + urllib.parse.quote(links[i].text) + page_uri + str(j)
+            data = extstockuri(list_uri)
+            for code, stock in data.items():
+                #extract under 600 yen
+                if int(re.sub('\D', '', stock)) < 600:
+                    time.sleep(2)
+                    #extract kabureal img
+                    img = extkaburealdata(kabureal + str(code))
+                    inf = extstock(base_uri + stock_uri + str(code))
+                    print(inf['name'])
+                    body.append({
+                        'name' : inf['name'],
+                        'code' : str(code),
+                        'stock' : str(stock),
+                        'img' : img,
+                        'info' : inf['info'],
+                        'head' : inf['tbhead'],
+                        'table' : inf['past'],
+                    })
+
+        print(links[i].text)
+        html = tmp.render({
+            'theme' : links[i].text,
+            'articles' : body })
+        print(html)
+        mail = SendByGmail(config)
+        msg = mail.make(links[i].text, html, 'html')
+        mail.send(msg)
 
 # extract themelink 10
 links = extlink(base_uri +  rank_uri)
-for i in range(9):
-    time.sleep(5)
-    body = []
-    # extract stock link & price links[i].text 5pages
-    for j in range(1, 5):
-        list_uri = base_uri + theme_uri + urllib.parse.quote(links[i].text) + page_uri + str(j)
-        data = extstockuri(list_uri)
-        for code, stock in data.items():
-            #extract under 600 yen
-            if int(re.sub('\D', '', stock)) < 600:
-                time.sleep(2)
-                #extract kabureal img
-                img = extkaburealdata(kabureal + str(code))
-                inf = extstock(base_uri + stock_uri + str(code))
-                print(inf['name'])
-                body.append({
-                    'name' : inf['name'],
-                    'code' : str(code),
-                    'stock' : str(stock),
-                    'img' : img,
-                    'info' : inf['info'],
-                    'head' : inf['tbhead'],
-                    'table' : inf['past'],
-                })
-
-    print(links[i].text)
-    html = tmp.render({
-        'theme' : links[i].text,
-        'articles' : body })
-    print(html)
-    mail = SendByGmail(config)
-    msg = mail.make(links[i].text, html, 'html')
-    mail.send(msg)
-
