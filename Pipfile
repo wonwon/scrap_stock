@@ -16,6 +16,7 @@ beautifulsoup = "*"
 beautifulsoup4 = "*"
 beutifulsoup4 = "*"
 beutifulsoup = "*"
+chardet = "*"
 
 [requires]
 python_version = "3.8"
