@@ -17,6 +17,7 @@ config['PASS'] =  config_ini['GMAIL']['PASS']
 
 
 #uri
+uri ='https://kabutan.jp/themes/?theme=%E3%82%AD%E3%83%A3%E3%83%83%E3%82%B7%E3%83%A5%E3%83%AC%E3%82%B9%E6%B1%BA%E6%B8%88&market=0&capitalization=-1&stc=zenhiritsu&stm=1&page=' 
 # kabutan theme url
 base_uri = 'https://kabutan.jp'
 stock_uri = '/stock/kabuka?code='
@@ -109,5 +110,4 @@ def sendmail(uri):
     msg = mail.make(themes, html, 'html')
     mail.send(msg)
 
-uri ='https://kabutan.jp/themes/?theme=%E3%82%AD%E3%83%A3%E3%83%83%E3%82%B7%E3%83%A5%E3%83%AC%E3%82%B9%E6%B1%BA%E6%B8%88&market=0&capitalization=-1&stc=zenhiritsu&stm=1&page=' 
 sendmail(uri)
