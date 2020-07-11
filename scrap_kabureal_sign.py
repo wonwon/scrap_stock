@@ -31,25 +31,16 @@ def uri2soup(uri):
     html = requests.get(uri)
     soup = BeautifulSoup(html.text, 'html.parser')
     return soup
+def extlist(uri):
+    # extract link from themes page
+    soup = uri2soup(uri)
+    data = soup.find_all(href = re.compile("\/sign\/\?sign_cd="))
+    return data
 
 def extlink(uri):
     # extract link from themes page
     soup = uri2soup(uri)
-    data = soup.select('td.td29 > a')
-    return data
-
-def extstockuri(uri):
-    # extract code and close stock from list
-    soup = uri2soup(uri)
-    data = {}
-    links = soup.select('td.tac > a')
-    stocks = soup.select('table.stock_table > tr > td:nth-child(6)')
-    for i in range(len(links)):
-        if stocks[i].text == '－':
-            data[links[i].text] = '600'
-        else:
-            data[links[i].text] = stocks[i].text
-
+    data = soup.select('div.lnkYF > a')
     return data
 
 def extimg(uri):
@@ -69,7 +60,6 @@ def extstock(uri):
     # stock history table row
     #for i in range(6):
         #body['past' + str(i)] = soup.select('table.boardFin > tbody > tr:nth-child(-n+6)')[i].text.replace('\n', ' ')
-         
     return body
 
 def sendmail(title, uri):
@@ -79,7 +69,7 @@ def sendmail(title, uri):
     body = []
     for i in range(1, 5):
         time.sleep(5)
-        links = extlink(uri + str(i))
+        links = extlink(uri + '&page=' + str(i))
         for j in range(len(links)):
             time.sleep(2)
             grep = re.match(r'.*?(\d+)\..$', links[j]['href'])
@@ -93,9 +83,10 @@ def sendmail(title, uri):
                 'code' : stock,
                 'stock' : info['stock'],
                 'img' : img,
-                'url' : links[j]['href'],
+                'url' : kabureal + stock,
                 'info' : info['industory'],
             })
+            print(body)
 
     html = tmp.render({
         'theme' : title ,
@@ -104,11 +95,11 @@ def sendmail(title, uri):
     msg = mail.make(title, html, 'html')
     mail.send(msg)
 
-uri = {
-    '連騰株' : 'http://kabureal.net/continueup/?page=',\
-    '短期急騰株' : 'http://kabureal.net/raterank/span/?d=1&page=',\
-}
 
-for k, v in uri.items():
-    print(k + ' ' + v)
-    sendmail(k , v)
+uri = 'http://kabureal.net'
+signs = extlist(uri)
+
+for sign in signs:
+    print(sign.text)
+    print(sign['href'].replace('/sign', '/sign/prompt'))
+    sendmail(sign.text, uri + sign['href'].replace('/sign', '/sign/prompt'))
