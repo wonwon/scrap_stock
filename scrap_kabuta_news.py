@@ -1,18 +1,22 @@
 import requests
 from bs4 import BeautifulSoup
 import time
-import Gmail
+from Gmail import SendByGmail
 from jinja2 import Environment, FileSystemLoader
-#import re
-#from DB import class_sqlite
+import configparser
 
 # fetch url
 base_uri = 'https://kabutan.jp/'
-news_uri = 'stock/news?code=3681&b=n202006060057'
+news_uri = 'info/accessranking/2_1'
 
-#gmail template
-env = Environment(loader = FileSystemLoader('./', encoding = 'utf8'))
-tmp = env.get_template('./tmp/gmail_html.tmpl')
+# mail config
+config_ini = configparser.ConfigParser()
+config_ini.read('./../../CONF/config.ini', encoding = 'utf-8')
+config = {}
+
+config['FROM'] = config_ini['GMAIL']['USER']
+config['TO'] = config_ini['GMAIL']['USER']
+config['PASS'] =  config_ini['GMAIL']['PASS']
 
 def uri2soup(uri):
     html = requests.get(uri)
@@ -20,20 +24,33 @@ def uri2soup(uri):
     return soup
 
 def extractlink(soup):
-    stocklist = {}
-    stocklist['title'] = soup.select('article > h1')[0]
-    stocklist['body'] = soup.select('article')[0]
+    data = soup.select('td.acrank_title > a')
+    return data
 
-    data = soup.select('div.body > a[href*="stock/?code="]')
-    for d in data:
-        stocklist[d.text] = d['href']
-    return stocklist
+def sendmail(data):
+    #gmail template
+    env = Environment(loader = FileSystemLoader('./', encoding = 'utf8'))
+    tmp = env.get_template('./tmp/kabutan_news_gmail.tmpl')
+
+    for d in data: 
+        body = []
+        news = uri2soup(base_uri + d['href'])
+        newsbody = news.select('div.body')
+        body.append({
+            'title' : d.text,
+            'url' : base_uri + d['href'],
+            'body' : newsbody,
+        })
+        print(body)
+
+        html = tmp.render({
+            'articles' : body })
+
+        mail = SendByGmail(config)
+        msg = mail.make(d.text, html, 'html')
+        mail.send(msg)
 
 uri = base_uri + news_uri
 soup = uri2soup(uri)
-stocklist = extractlink(soup)
-
-html = tmp.render({\
-        'mailbody': stocklist['body'],\
-         })
-print(html)
+pages = extractlink(soup)
+sendmail(pages)

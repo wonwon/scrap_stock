@@ -68,7 +68,7 @@ def extstock(uri):
     # stock history table row
     for i in range(5):
         body['past' + str(i)] = soup.select('table.stock_kabuka1 > tbody > tr:nth-child(-n+5)')[i].text.replace('\n', ' ')
-         
+
     return body
 
 def sendmail(links):
